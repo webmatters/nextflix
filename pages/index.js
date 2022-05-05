@@ -1,7 +1,7 @@
 import Head from 'next/head'
 
 import styles from '../styles/Home.module.css'
-// import NavBar from ''
+import NavBar from 'components/nav/Navbar'
 import Banner from 'components/banner/Banner'
 // import Card from ''
 
@@ -14,8 +14,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <h1>Nextflix</h1>
-      {/* <NavBar /> */}
+      <NavBar username="amsmith66@outlook.com" />
       <Banner
         title="Clifford the Big Red Dog"
         subtitle="a very cute dog"

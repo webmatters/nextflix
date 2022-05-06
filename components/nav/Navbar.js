@@ -1,11 +1,40 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import Link from 'next/link'
 import Image from 'next/image'
 
 import styles from './Navbar.module.css'
+import { magic } from 'lib/magic-client'
 
-export default function Navbar({ username }) {
+export default function Navbar() {
   const [showDropdown, setShowDropdown] = useState(false)
+  const [username, setUsername] = useState('')
+
+  useEffect(() => {
+    const getUserData = async () => {
+      try {
+        const { email } = await magic.user.getMetadata()
+        if (email) {
+          setUsername(email)
+        }
+      } catch (error) {
+        console.error('There was a problem getting the user data', error)
+      }
+    }
+    getUserData()
+  }, [])
+
+  const router = useRouter()
+
+  const handleSignout = async event => {
+    try {
+      await magic.user.logout()
+      console.log(await magic.user.isLoggedIn())
+      router.push('/login')
+    } catch (error) {
+      console.error('There was an error signing the user out.', error)
+    }
+  }
 
   return (
     <div className={styles.container}>
@@ -52,10 +81,9 @@ export default function Navbar({ username }) {
             {showDropdown && (
               <div className={styles.navDropdown}>
                 <div>
-                  <Link href="/login">
-                    <a className={styles.linkName}>Sign Out</a>
-                  </Link>
-                  <div className={styles.lineWrapper}></div>
+                  <a className={styles.linkName} onClick={handleSignout}>
+                    Sign Out
+                  </a>
                 </div>
               </div>
             )}

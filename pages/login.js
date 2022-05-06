@@ -1,22 +1,54 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
 
 import styles from 'styles/Login.module.css'
+import { magic } from 'lib/magic-client'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [userMsg, setUserMsg] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleOnChangeEmail = e => {
+  const router = useRouter()
+
+  useEffect(() => {
+    const handleComplete = () => {
+      setIsLoading(false)
+    }
+
+    router.events.on('routeChangeComplete', handleComplete)
+    router.events.on('routeChangeError', handleComplete)
+
+    return () => {
+      router.events.off('routeChangeComplete', handleComplete)
+      router.events.off('routeChangeError', handleComplete)
+    }
+  }, [router])
+
+  const handleOnChangeEmail = event => {
     setUserMsg('')
-    setEmail(e.target.value)
+    setEmail(event.target.value)
   }
 
-  const handleLogin = e => {
+  const handleLogin = async e => {
     if (email) {
-      // route to home page
+      if (email === 'bodhicoder@gmail.com') {
+        try {
+          setIsLoading(true)
+          const didToken = await magic.auth.loginWithMagicLink({ email })
+          if (didToken) {
+            router.push('/')
+          }
+        } catch (error) {
+          console.error('Something went wrong signing in', error)
+          setIsLoading(false)
+        }
+      } else {
+        setUserMsg('There was a problem signing you in.')
+      }
     } else {
       setUserMsg('Please enter a valid email address.')
     }
@@ -54,7 +86,7 @@ export default function Login() {
           />
           {userMsg && <p className={styles.userMsg}>{userMsg}</p>}
           <button className={styles.loginBtn} onClick={handleLogin}>
-            Sign In
+            {isLoading ? 'Loading...' : 'Sign In'}
           </button>
         </div>
       </main>

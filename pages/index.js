@@ -19,7 +19,7 @@ export default function Home(props) {
       </Head>
 
       <div className={styles.main}>
-        <NavBar username="amsmith66@outlook.com" />
+        <NavBar />
         <Banner
           title="Clifford the Big Red Dog"
           subtitle="Dreams can come true"

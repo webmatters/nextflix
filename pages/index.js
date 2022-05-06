@@ -1,11 +1,15 @@
 import Head from 'next/head'
 
 import styles from '../styles/Home.module.css'
+import { getVideos } from 'lib/videos'
+
 import NavBar from 'components/nav/Navbar'
 import Banner from 'components/banner/Banner'
-// import Card from ''
+import SectionCards from 'components/card/SectionCards'
 
-export default function Home() {
+export default function Home(props) {
+  const { disneyVideos, sciFiVideos, travelVideos, popularVideos } = props
+
   return (
     <div className={styles.container}>
       <Head>
@@ -14,13 +18,28 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <NavBar username="amsmith66@outlook.com" />
-      <Banner
-        title="Clifford the Big Red Dog"
-        subtitle="a very cute dog"
-        imgUrl="/static/clifford.webp"
-      />
-      {/* <Card /> */}
+      <div className={styles.main}>
+        <NavBar username="amsmith66@outlook.com" />
+        <Banner
+          title="Clifford the Big Red Dog"
+          subtitle="Dreams can come true"
+          imgUrl="/static/clifford.webp"
+        />
+        <div className={styles.sectionWrapper}>
+          <SectionCards title={'Disney'} videos={disneyVideos} size="large" />
+          <SectionCards title={'Sci-Fi'} videos={sciFiVideos} size="small" />
+          <SectionCards title={'Comedy'} videos={travelVideos} size="medium" />
+          <SectionCards title={'Romance'} videos={popularVideos} size="small" />
+        </div>
+      </div>
     </div>
   )
+}
+
+export async function getServerSideProps() {
+  const disneyVideos = await getVideos('disney movie')
+  const sciFiVideos = await getVideos('sci-fi movie')
+  const travelVideos = await getVideos('comedy movie')
+  const popularVideos = await getVideos('romance movie')
+  return { props: { disneyVideos, sciFiVideos, travelVideos, popularVideos } }
 }
